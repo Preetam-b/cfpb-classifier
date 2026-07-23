@@ -65,9 +65,9 @@ Given a consumer complaint narrative, the model predicts which financial product
 - Streamlit (Local UI)
 - Gradio (HuggingFace Spaces)
 - HuggingFace Hub (Model hosting)
-- AWS SageMaker (Cloud deployment)
-
-- cfpb-classifier/
+- AWS S3 (Model storage)
+- AWS SageMaker (Real-time inference endpoint)
+cfpb-classifier/
 │
 ├── data/
 │ ├── preprocess.ipynb ← Data cleaning + balancing
@@ -81,15 +81,17 @@ Given a consumer complaint narrative, the model predicts which financial product
 │ ├── app.py ← Streamlit UI
 │ └── requirements.txt
 │
-├── huggingface/
-│ ├── app.py ← Gradio app for HF Spaces
+├── sagemaker/
+│ ├── deploy.py ← SageMaker deployment script
 │ └── requirements.txt
 │
 ├── .gitignore
 └── README.md
 
 
+---
 
+## 🔧 How to Run Locally
 
 **1. Clone the repository:**
 ```bash
@@ -121,6 +123,35 @@ FastAPI docs → http://localhost:8000/docs
 
 ---
 
+## ☁️ AWS SageMaker Deployment
+
+**1. Upload model to S3:**
+
+Bucket: cfpb-classifier-model
+Path : s3://cfpb-classifier-model/bert_model/
+
+
+**2. Deploy endpoint:**
+```bash
+pip install -r sagemaker/requirements.txt
+python sagemaker/deploy.py
+```
+
+**3. Test endpoint:**
+```python
+result = predictor.predict({
+    "inputs": "My credit card company charged me incorrect fees."
+})
+# Output: [{'label': 'Credit Card', 'score': 0.87}]
+```
+
+**4. Delete endpoint after use:**
+```python
+predictor.delete_endpoint()
+```
+
+---
+
 ## 📈 Dataset
 - **Source:** [CFPB Consumer Complaint Database](https://www.consumerfinance.gov/data-research/consumer-complaints/)
 - **Size:** 50,000 samples (balanced using under/oversampling)
@@ -142,12 +173,13 @@ FastAPI docs → http://localhost:8000/docs
 - 🤗 **Live Demo:** [HuggingFace Spaces](https://huggingface.co/spaces/P-r-e-e-t-a-m/cfpb-classifier)
 - 🤗 **Model:** [HuggingFace Hub](https://huggingface.co/P-r-e-e-t-a-m/cfpb-bert-classifier)
 - 💻 **GitHub:** [cfpb-classifier](https://github.com/Preetam-b/cfpb-classifier)
+- ☁️ **S3 Bucket:** cfpb-classifier-model
+- 🚀 **SageMaker:** Real-time inference endpoint (deploy on demand)
 
 ---
 
 ## 👨‍💻 Author
 **Preetam** — [GitHub](https://github.com/Preetam-b)
-
 
 ---
 
